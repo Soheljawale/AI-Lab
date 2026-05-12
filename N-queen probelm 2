@@ -1,0 +1,106 @@
+import random
+import math
+import heapq
+
+
+def conflicts(state):
+    n = len(state)
+    count = 0
+
+    for i in range(n):
+        for j in range(i + 1, n):
+            if state[i] == state[j] or abs(state[i] - state[j]) == j - i:
+                count += 1
+
+    return count
+
+
+def hill_climbing(n, max_steps=1000):
+    state = [random.randint(0, n - 1) for _ in range(n)]
+
+    for _ in range(max_steps):
+        current_conflicts = conflicts(state)
+
+        if current_conflicts == 0:
+            return state
+
+        neighbors = []
+
+        for col in range(n):
+            for row in range(n):
+                if row != state[col]:
+                    neighbor = state.copy()
+                    neighbor[col] = row
+                    neighbors.append(neighbor)
+
+        best_neighbor = min(neighbors, key=conflicts)
+
+        if conflicts(best_neighbor) >= current_conflicts:
+            break
+
+        state = best_neighbor
+
+    return None
+
+
+def simulated_annealing(n, T=1000, cooling_rate=0.99, min_T=0.1):
+    state = [random.randint(0, n - 1) for _ in range(n)]
+
+    while T > min_T:
+        current_conflicts = conflicts(state)
+
+        if current_conflicts == 0:
+            return state
+
+        col = random.randint(0, n - 1)
+        row = random.randint(0, n - 1)
+
+        neighbor = state.copy()
+        neighbor[col] = row
+
+        delta = conflicts(neighbor) - current_conflicts
+
+        if delta < 0 or random.random() < math.exp(-delta / T):
+            state = neighbor
+
+        T *= cooling_rate
+
+    return None
+
+
+def astar_nqueens(n):
+    start = tuple(random.randint(0, n - 1) for _ in range(n))
+
+    pq = [(conflicts(start), 0, start)]
+    visited = set()
+
+    while pq:
+        f, g, state = heapq.heappop(pq)
+
+        if conflicts(state) == 0:
+            return list(state)
+
+        if state in visited:
+            continue
+
+        visited.add(state)
+
+        for col in range(n):
+            for row in range(n):
+                if row != state[col]:
+                    new_state = list(state)
+                    new_state[col] = row
+                    new_state = tuple(new_state)
+
+                    if new_state not in visited:
+                        h = conflicts(new_state)
+                        heapq.heappush(pq, (g + 1 + h, g + 1, new_state))
+
+    return None
+
+
+n = 8
+
+print("Hill Climbing:", hill_climbing(n))
+print("Simulated Annealing:", simulated_annealing(n))
+print("A* Search:", astar_nqueens(n))
