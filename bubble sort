@@ -1,0 +1,15 @@
+def Bubble_sort(arr):
+  n = len(arr)
+
+  for i in range(n):
+    for j in range(0,n-i-1):
+
+      if arr[j] > arr[j+1]:
+        arr[j], arr[j+1] = arr[j+1], arr[j]
+  return arr
+
+numbers = [34,67,90,3,0,11,676]
+print("before bubble sort", numbers)
+
+sorted_list = Bubble_sort(numbers)
+print("after bubble sorting ",sorted_list)
