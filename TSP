@@ -1,0 +1,46 @@
+import math
+
+def distance(city1, city2):
+    return math.sqrt((city1[0] - city2[0])**2 + (city1[1] - city2[1])**2)
+
+def tsp_nearest_neighbor(cities):
+    n = len(cities)
+    visited = [False] * n
+    path = [0]
+    visited[0] = True
+    total_cost = 0
+    current_city = 0
+
+    for _ in range(n - 1):
+        nearest_city = None
+        min_dist = float('inf')
+
+        for i in range(n):
+            if not visited[i]:
+                dist = distance(cities[current_city], cities[i])
+                if dist < min_dist:
+                    min_dist = dist
+                    nearest_city = i
+
+        visited[nearest_city] = True
+        path.append(nearest_city)
+        total_cost += min_dist
+        current_city = nearest_city
+
+    total_cost += distance(cities[current_city], cities[0])
+    path.append(0)
+
+    return path, total_cost
+
+cities = [
+    (0, 0),
+    (2, 3),
+    (5, 2),
+    (6, 6),
+    (8, 3)
+]
+
+path, cost = tsp_nearest_neighbor(cities)
+
+print("Path:", path)
+print("Total cost:", round(cost, 2))
